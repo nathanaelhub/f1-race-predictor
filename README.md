@@ -3,7 +3,11 @@
 <div align="center">
 
 ### 🚀 **LIVE DEMO**
+<<<<<<< HEAD
 [![Live Demo](https://img.shields.io/badge/🌐_Try_Live_Demo-FF1E00?style=for-the-badge&logoColor=white)](https://f1-race-predictor-yr49.onrender.com)
+=======
+[![Live Demo](https://img.shields.io/badge/🌐_Try_Live_Demo-FF1E00?style=for-the-badge&logoColor=white)]([https://f1-predictor.onrender.com](https://f1-race-predictor-yr49.onrender.com))
+>>>>>>> 3fd328bfb08589f039e9cf1f95bf10217bc222c4
 
 *Click above to experience the interactive F1 prediction system!*
 
