@@ -5,7 +5,7 @@ Modern F1 broadcast interface with animations and real-time updates
 """
 
 import json
-import numpy as np
+import random
 from flask import Flask, request, jsonify, Response
 from datetime import datetime
 
@@ -818,20 +818,20 @@ def predict():
     for i, (code, quali_time) in enumerate(sorted_quali):
         if code in DRIVERS:
             # Apply feature weights to prediction
-            base_change = np.random.normal(0, 2)
+            base_change = random.gauss(0, 2)
             
             # Weight adjustments
             quali_factor = weights.get('quali', 0.7) * 0.5
-            pace_factor = weights.get('pace', 0.6) * np.random.uniform(-1, 1)
-            tire_factor = weights.get('tire', 0.45) * np.random.uniform(-0.5, 0.5)
-            weather_factor = weights.get('weather', 0.3) * np.random.uniform(-0.3, 0.3)
-            strategy_factor = weights.get('strategy', 0.5) * np.random.uniform(-0.8, 0.8)
+            pace_factor = weights.get('pace', 0.6) * random.uniform(-1, 1)
+            tire_factor = weights.get('tire', 0.45) * random.uniform(-0.5, 0.5)
+            weather_factor = weights.get('weather', 0.3) * random.uniform(-0.3, 0.3)
+            strategy_factor = weights.get('strategy', 0.5) * random.uniform(-0.8, 0.8)
             
             total_change = base_change + pace_factor + tire_factor + weather_factor + strategy_factor
             predicted_pos = max(1, min(10, int(i + 1 + total_change)))
             
             # Calculate confidence based on weights
-            confidence = 0.5 + (quali_factor * 0.3) + np.random.uniform(0, 0.2)
+            confidence = 0.5 + (quali_factor * 0.3) + random.uniform(0, 0.2)
             confidence = min(0.95, max(0.4, confidence))
             
             total_confidence += confidence
