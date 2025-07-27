@@ -3,7 +3,7 @@
 <div align="center">
 
 ### 🚀 **LIVE DEMO**
-[![Live Demo](https://img.shields.io/badge/🌐_Try_Live_Demo-FF1E00?style=for-the-badge&logoColor=white)](https://f1-predictor.onrender.com)
+[![Live Demo](https://img.shields.io/badge/🌐_Try_Live_Demo-FF1E00?style=for-the-badge&logoColor=white)](https://f1-race-predictor-yr49.onrender.com)
 
 *Click above to experience the interactive F1 prediction system!*
 
@@ -61,7 +61,7 @@ This **graduate research project** demonstrates the power of machine learning in
 ## 🚀 Quick Start
 
 ### Option 1: **Try the Live Demo** (Fastest!)
-**[🌐 Launch Interactive Demo](https://f1-predictor.onrender.com)**
+**[🌐 Launch Interactive Demo](https://f1-race-predictor-yr49.onrender.com)**
 
 Experience the full F1 prediction system instantly in your browser!
 
@@ -158,7 +158,7 @@ prediction_features = {
 ## 🎮 Demo Modes
 
 ### 1. **🌐 Live Web Demo** (Recommended)
-**[Try Interactive Demo](https://f1-predictor.onrender.com)** - Full-featured F1 interface
+**[Try Interactive Demo](https://f1-race-predictor-yr49.onrender.com)** - Full-featured F1 interface
 
 ### 2. **💻 Command Line Demo**
 ```bash
@@ -243,7 +243,7 @@ This project is open source and available under the [MIT License](LICENSE).
 
 <div align="center">
 
-**🏁 Ready to predict the next race? [Launch the Demo!](https://f1-predictor.onrender.com) 🏁**
+**🏁 Ready to predict the next race? [Launch the Demo!](https://f1-race-predictor-yr49.onrender.com) 🏁**
 
 *Built with ❤️ for Formula 1, Machine Learning, and the pursuit of predictive excellence*
 
