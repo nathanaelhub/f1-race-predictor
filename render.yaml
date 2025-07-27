@@ -5,16 +5,3 @@ services:
     plan: free
     buildCommand: pip install -r requirements.txt
     startCommand: python app.py
-    envVars:
-      - key: PYTHON_VERSION
-        value: 3.11.4
-      - key: FLASK_ENV
-        value: production
-      - key: FLASK_DEBUG
-        value: false
-    healthCheckPath: /
-    autoDeploy: true
-    disk:
-      name: f1-predictor-data
-      mountPath: /opt/render/project/src
-      sizeGB: 1
