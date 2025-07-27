@@ -1,7 +1,9 @@
 services:
   - type: web
-    name: f1-race-predictor
-    env: python
-    plan: free
-    buildCommand: pip install -r requirements.txt
-    startCommand: python app.py
+    name: f1-predictor
+    runtime: python3
+    buildCommand: "pip install --upgrade pip setuptools wheel && pip install -r requirements.txt"
+    startCommand: "python app.py"
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11"
