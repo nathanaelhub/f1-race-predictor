@@ -1,0 +1,69 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+venv/
+env/
+.env
+
+# Data files
+*.csv
+data/cache/
+data/raw/
+*.pkl
+*.joblib
+
+# Notebooks
+.ipynb_checkpoints/
+notebooks/*_dev.ipynb
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Archive folder
+archive/
+
+# Logs
+*.log
+
+# Model files (too large for GitHub)
+model/*.h5
+model/*.pb
+model/checkpoints/
+
+# Temporary files
+tmp/
+temp/
+
+# Large data files
+data/*.csv
+data/f1_races_combined.csv
+
+# Environment files
+.env.*
+docker-compose.override.yml
+
+# Backend build artifacts
+backend/dist/
+backend/build/
+
+# Frontend build artifacts  
+frontend/dist/
+frontend/build/
+frontend/node_modules/
+
+# Docker
+.dockerignore
