@@ -245,9 +245,9 @@ This project is open source and available under the [MIT License](LICENSE).
 ## 📞 Contact
 
 **Interested in discussing this project?**
-- 🔗 LinkedIn: [Your LinkedIn Profile]
-- 📧 Email: [Your Email]
-- 🐙 GitHub: [Your GitHub Profile]
+- 🔗 LinkedIn: @nathanaeljdj
+- 📧 Email: nathanaeljdjohnson@gmail.com
+- 🐙 GitHub: @nathanaelhub
 
 ---
 
