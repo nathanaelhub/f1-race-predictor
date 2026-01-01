@@ -19,7 +19,7 @@ So I built this to find out! Turns out, it's surprisingly accurate (and really f
 
 <div align="center">
 
-![F1 Predictor Demo](docs/images/f1-predictor-demo.gif)
+![F1 Predictor Screenshot](docs/images/f1-predictor-screenshot.png)
 
 *Real-time ML predictions with interactive feature tuning*
 
