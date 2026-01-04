@@ -77,8 +77,8 @@ Experience the full F1 prediction system instantly in your browser!
 
 ### Option 2: **Run Locally** (For Development)
 ```bash
-git clone https://github.com/yourusername/f1-prediction-system
-cd f1-prediction-system
+git clone https://github.com/nathanaelhub/f1-race-predictor.git
+cd f1-race-predictor
 pip install -r requirements.txt
 python app.py
 # Open http://localhost:5000
