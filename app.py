@@ -11,18 +11,21 @@ from datetime import datetime
 
 app = Flask(__name__)
 
-# F1 2024 Drivers with teams
+# Current F1 grid (Hamilton to Ferrari, Antonelli in at Mercedes,
+# Sainz to Williams, Tsunoda alongside Verstappen)
 DRIVERS = {
     'VER': {'name': 'Max Verstappen', 'team': 'Red Bull', 'number': 1},
-    'PER': {'name': 'Sergio Perez', 'team': 'Red Bull', 'number': 11},
-    'HAM': {'name': 'Lewis Hamilton', 'team': 'Mercedes', 'number': 44},
+    'TSU': {'name': 'Yuki Tsunoda', 'team': 'Red Bull', 'number': 22},
     'RUS': {'name': 'George Russell', 'team': 'Mercedes', 'number': 63},
+    'ANT': {'name': 'Kimi Antonelli', 'team': 'Mercedes', 'number': 12},
     'LEC': {'name': 'Charles Leclerc', 'team': 'Ferrari', 'number': 16},
-    'SAI': {'name': 'Carlos Sainz', 'team': 'Ferrari', 'number': 55},
+    'HAM': {'name': 'Lewis Hamilton', 'team': 'Ferrari', 'number': 44},
     'NOR': {'name': 'Lando Norris', 'team': 'McLaren', 'number': 4},
     'PIA': {'name': 'Oscar Piastri', 'team': 'McLaren', 'number': 81},
     'ALO': {'name': 'Fernando Alonso', 'team': 'Aston Martin', 'number': 14},
-    'STR': {'name': 'Lance Stroll', 'team': 'Aston Martin', 'number': 18}
+    'STR': {'name': 'Lance Stroll', 'team': 'Aston Martin', 'number': 18},
+    'SAI': {'name': 'Carlos Sainz', 'team': 'Williams', 'number': 55},
+    'ALB': {'name': 'Alex Albon', 'team': 'Williams', 'number': 23}
 }
 
 # HTML with advanced UI
