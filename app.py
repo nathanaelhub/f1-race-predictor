@@ -811,9 +811,12 @@ def index():
 
 @app.route('/api/predict', methods=['POST'])
 def predict():
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
     qualifying = data.get('qualifying', {})
     weights = data.get('weights', {})
+    # clamp weights to [0, 1] so a hand-crafted request can't blow up the math
+    weights = {k: min(1.0, max(0.0, float(v))) for k, v in weights.items()
+               if isinstance(v, (int, float))}
     
     # Sort by qualifying
     sorted_quali = sorted(qualifying.items(), key=lambda x: x[1])
