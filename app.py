@@ -870,6 +870,11 @@ def predict():
         'volatility': round(3.5 - weights.get('quali', 0.7) * 2, 1)
     })
 
+@app.route('/health')
+def health():
+    return jsonify({'status': 'ok', 'drivers': len(DRIVERS)})
+
+
 if __name__ == '__main__':
     import os
     port = int(os.environ.get('PORT', 5000))
