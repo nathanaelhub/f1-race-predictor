@@ -51,6 +51,10 @@ Built over several weekends with lots of coffee and F1 race replays in the backg
 ## ✨ Key Features
 
 ### 🎮 **Interactive Experience**
+
+![Feature tuning](docs/images/feature-tuning.png)
+![Predictions view](docs/images/predictions.png)
+
 - **🎨 F1-Themed UI** - Dark theme with animated gradients and authentic F1 red accents
 - **⚙️ Real-time Feature Tuning** - Adjust model weights with smooth sliders
 - **🏆 Animated Podium Display** - Gold/silver/bronze podiums with confidence visualizations
