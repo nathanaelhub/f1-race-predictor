@@ -5,6 +5,7 @@ Modern F1 broadcast interface with animations and real-time updates
 """
 
 import json
+import os
 import random
 from flask import Flask, request, jsonify, Response
 from datetime import datetime
@@ -876,6 +877,5 @@ def health():
 
 
 if __name__ == '__main__':
-    import os
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
