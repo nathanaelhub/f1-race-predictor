@@ -1,0 +1,79 @@
+{
+  "data": {
+    "seasons": "2014-2026",
+    "races": 259,
+    "driver_race_rows": 5259,
+    "source": "Jolpica / Ergast F1 API"
+  },
+  "model": "HistGradientBoosting (sklearn) \u2014 finish-position regressor + podium classifier",
+  "backtest": {
+    "pooled": {
+      "model": {
+        "winner_hit": 0.543,
+        "podium_p3": 0.652,
+        "spearman": 0.647
+      },
+      "grid_baseline": {
+        "winner_hit": 0.5,
+        "podium_p3": 0.645,
+        "spearman": 0.607
+      },
+      "races": 92
+    },
+    "by_season": {
+      "2022": {
+        "races": 22,
+        "model": {
+          "winner_hit": 0.318,
+          "podium_p3": 0.667,
+          "spearman": 0.571
+        },
+        "grid_baseline": {
+          "winner_hit": 0.364,
+          "podium_p3": 0.545,
+          "spearman": 0.481
+        }
+      },
+      "2023": {
+        "races": 22,
+        "model": {
+          "winner_hit": 0.727,
+          "podium_p3": 0.636,
+          "spearman": 0.649
+        },
+        "grid_baseline": {
+          "winner_hit": 0.545,
+          "podium_p3": 0.621,
+          "spearman": 0.557
+        }
+      },
+      "2024": {
+        "races": 24,
+        "model": {
+          "winner_hit": 0.458,
+          "podium_p3": 0.611,
+          "spearman": 0.707
+        },
+        "grid_baseline": {
+          "winner_hit": 0.417,
+          "podium_p3": 0.653,
+          "spearman": 0.727
+        }
+      },
+      "2025": {
+        "races": 24,
+        "model": {
+          "winner_hit": 0.667,
+          "podium_p3": 0.694,
+          "spearman": 0.654
+        },
+        "grid_baseline": {
+          "winner_hit": 0.667,
+          "podium_p3": 0.75,
+          "spearman": 0.651
+        }
+      }
+    }
+  },
+  "feature_importance_note": "permutation importance computed separately"
+}

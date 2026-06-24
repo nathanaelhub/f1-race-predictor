@@ -5,25 +5,36 @@ Modern F1 broadcast interface with animations and real-time updates
 """
 
 import json
-import random
+import sys
+from pathlib import Path
+
 from flask import Flask, request, jsonify, Response
-from datetime import datetime
+
+sys.path.insert(0, str(Path(__file__).resolve().parent / "model"))
+from predict import available, predict_race  # noqa: E402
 
 app = Flask(__name__)
 
-# F1 2024 Drivers with teams
+# Real 2026 grid + circuit list, sourced from the trained-model snapshot
+# (model/driver_form_2026.json, built by model/train.py from the Jolpica data).
+_FORM = available()
+_DRV = _FORM["drivers"]
+
+# code -> {name, team, number} for the UI, ordered by current championship points
 DRIVERS = {
-    'VER': {'name': 'Max Verstappen', 'team': 'Red Bull', 'number': 1},
-    'PER': {'name': 'Sergio Perez', 'team': 'Red Bull', 'number': 11},
-    'HAM': {'name': 'Lewis Hamilton', 'team': 'Mercedes', 'number': 44},
-    'RUS': {'name': 'George Russell', 'team': 'Mercedes', 'number': 63},
-    'LEC': {'name': 'Charles Leclerc', 'team': 'Ferrari', 'number': 16},
-    'SAI': {'name': 'Carlos Sainz', 'team': 'Ferrari', 'number': 55},
-    'NOR': {'name': 'Lando Norris', 'team': 'McLaren', 'number': 4},
-    'PIA': {'name': 'Oscar Piastri', 'team': 'McLaren', 'number': 81},
-    'ALO': {'name': 'Fernando Alonso', 'team': 'Aston Martin', 'number': 14},
-    'STR': {'name': 'Lance Stroll', 'team': 'Aston Martin', 'number': 18}
+    code: {"name": d["driver_name"], "team": d["constructor_name"], "number": d["car_number"]}
+    for code, d in sorted(_DRV.items(), key=lambda kv: -(kv[1].get("drv_pts_season") or 0))
 }
+
+# <option> list for the circuit selector
+CIRCUIT_OPTIONS = "".join(
+    f'<option value="{c["circuit_id"]}">{c["circuit_name"]}</option>'
+    for c in _FORM["circuits"]
+)
+
+# Headline backtest number shown in the metrics strip (from model/metrics.json)
+_METRICS = json.loads((Path(__file__).resolve().parent / "model" / "metrics.json").read_text())
+WINNER_ACC = int(round(_METRICS["backtest"]["pooled"]["model"]["winner_hit"] * 100))
 
 # HTML with advanced UI
 HTML_PAGE = """
@@ -474,47 +485,30 @@ HTML_PAGE = """
         </div>
         
         <div class="main-grid">
-            <!-- Left Panel - Feature Tuning -->
+            <!-- Left Panel - Model Controls -->
             <div class="card">
-                <h2>⚙️ Feature Tuning</h2>
-                
+                <h2>⚙️ Model Controls</h2>
+
                 <div class="feature-slider">
-                    <label>Qualifying Time Weight</label>
+                    <label>Qualifying influence</label>
                     <div class="slider-container">
                         <input type="range" id="quali-weight" min="0" max="100" value="70">
                         <span class="slider-value">70%</span>
                     </div>
+                    <p style="color:#888; font-size:0.8rem; margin-top:8px; line-height:1.4;">
+                        Blends the raw grid order with the model's form-aware
+                        prediction. 100% = trust qualifying; 0% = trust the model's
+                        view of car &amp; driver form.
+                    </p>
                 </div>
-                
-                <div class="feature-slider">
-                    <label>Clean Air Race Pace</label>
-                    <div class="slider-container">
-                        <input type="range" id="pace-weight" min="0" max="100" value="60">
-                        <span class="slider-value">60%</span>
-                    </div>
-                </div>
-                
-                <div class="feature-slider">
-                    <label>Tire Degradation</label>
-                    <div class="slider-container">
-                        <input type="range" id="tire-weight" min="0" max="100" value="45">
-                        <span class="slider-value">45%</span>
-                    </div>
-                </div>
-                
-                <div class="feature-slider">
-                    <label>Weather Impact</label>
-                    <div class="slider-container">
-                        <input type="range" id="weather-weight" min="0" max="100" value="30">
-                        <span class="slider-value">30%</span>
-                    </div>
-                </div>
-                
-                <div class="feature-slider">
-                    <label>Strategy Factor</label>
-                    <div class="slider-container">
-                        <input type="range" id="strategy-weight" min="0" max="100" value="50">
-                        <span class="slider-value">50%</span>
+
+                <div style="border-top:1px solid #2a2a2a; margin:18px 0; padding-top:16px;">
+                    <h3 style="font-size:0.95rem; color:#bbb; margin-bottom:10px;">Model card</h3>
+                    <div style="font-size:0.82rem; color:#999; line-height:1.7;">
+                        <div>Data&nbsp;·&nbsp;<b style="color:#ddd;">Jolpica / Ergast</b>, 2014–2026</div>
+                        <div>Model&nbsp;·&nbsp;<b style="color:#ddd;">HistGradientBoosting</b></div>
+                        <div>Backtest winner acc&nbsp;·&nbsp;<b style="color:#ff1e00;">""" + str(WINNER_ACC) + """%</b></div>
+                        <div>Validated on&nbsp;·&nbsp;<b style="color:#ddd;">92 races (2022–25)</b></div>
                     </div>
                 </div>
             </div>
@@ -524,13 +518,7 @@ HTML_PAGE = """
                 <!-- Track Selection -->
                 <div class="card" style="margin-bottom: 20px;">
                     <label style="font-weight: bold; margin-bottom: 10px; display: block;">Select Circuit:</label>
-                    <select id="track">
-                        <option>Monaco - Street Circuit</option>
-                        <option>Silverstone - High Speed</option>
-                        <option>Monza - Temple of Speed</option>
-                        <option>Singapore - Night Race</option>
-                        <option>Suzuka - Technical</option>
-                    </select>
+                    <select id="track">""" + CIRCUIT_OPTIONS + """</select>
                 </div>
                 
                 <!-- Podium Display -->
@@ -574,15 +562,15 @@ HTML_PAGE = """
                 <div class="metrics-grid">
                     <div class="metric-card">
                         <div class="metric-value" id="accuracy">0%</div>
-                        <div class="metric-label">Model Accuracy</div>
+                        <div class="metric-label">Winner Acc (backtest)</div>
                     </div>
                     <div class="metric-card">
                         <div class="metric-value" id="confidence">0%</div>
-                        <div class="metric-label">Avg Confidence</div>
+                        <div class="metric-label">Podium Confidence</div>
                     </div>
                     <div class="metric-card">
                         <div class="metric-value" id="volatility">0</div>
-                        <div class="metric-label">Race Volatility</div>
+                        <div class="metric-label">Avg Δ vs Grid</div>
                     </div>
                 </div>
                 
@@ -609,53 +597,57 @@ HTML_PAGE = """
                 <div class="card">
                     <h2>📊 Feature Importance</h2>
                     
+                    <p style="color:#888; font-size:0.8rem; margin:-6px 0 14px; line-height:1.4;">
+                        Permutation importance on the 2025 hold-out (grouped).
+                    </p>
+
                     <div class="importance-bar">
                         <div class="importance-label">
-                            <span>Qualifying Position</span>
-                            <span>85%</span>
+                            <span>Qualifying &amp; grid</span>
+                            <span>39%</span>
                         </div>
                         <div class="importance-track">
-                            <div class="importance-fill" style="width: 85%"></div>
+                            <div class="importance-fill" style="width: 39%"></div>
                         </div>
                     </div>
-                    
+
                     <div class="importance-bar">
                         <div class="importance-label">
-                            <span>Team Performance</span>
-                            <span>72%</span>
+                            <span>Car / constructor form</span>
+                            <span>27%</span>
                         </div>
                         <div class="importance-track">
-                            <div class="importance-fill" style="width: 72%"></div>
+                            <div class="importance-fill" style="width: 27%"></div>
                         </div>
                     </div>
-                    
+
                     <div class="importance-bar">
                         <div class="importance-label">
-                            <span>Driver Skill</span>
-                            <span>68%</span>
+                            <span>Driver recent form</span>
+                            <span>21%</span>
                         </div>
                         <div class="importance-track">
-                            <div class="importance-fill" style="width: 68%"></div>
+                            <div class="importance-fill" style="width: 21%"></div>
                         </div>
                     </div>
-                    
+
                     <div class="importance-bar">
                         <div class="importance-label">
-                            <span>Track History</span>
-                            <span>55%</span>
+                            <span>Experience &amp; teammate gap</span>
+                            <span>9%</span>
                         </div>
                         <div class="importance-track">
-                            <div class="importance-fill" style="width: 55%"></div>
+                            <div class="importance-fill" style="width: 9%"></div>
                         </div>
                     </div>
-                    
+
                     <div class="importance-bar">
                         <div class="importance-label">
-                            <span>Weather Conditions</span>
-                            <span>42%</span>
+                            <span>Circuit history</span>
+                            <span>4%</span>
                         </div>
                         <div class="importance-track">
-                            <div class="importance-fill" style="width: 42%"></div>
+                            <div class="importance-fill" style="width: 4%"></div>
                         </div>
                     </div>
                 </div>
@@ -672,7 +664,7 @@ HTML_PAGE = """
                         <th>Team</th>
                         <th>Qualifying</th>
                         <th>Change</th>
-                        <th>Confidence</th>
+                        <th>Podium %</th>
                     </tr>
                 </thead>
                 <tbody id="predictions-body">
@@ -707,31 +699,23 @@ HTML_PAGE = """
             return qualifying;
         }
         
-        // Generate predictions with feature weights
+        // Generate predictions from a simulated qualifying order + the live model
         async function generatePredictions() {
             const loading = document.getElementById('loading');
             loading.style.display = 'block';
-            
-            // Get feature weights
-            const weights = {
-                quali: document.getElementById('quali-weight').value / 100,
-                pace: document.getElementById('pace-weight').value / 100,
-                tire: document.getElementById('tire-weight').value / 100,
-                weather: document.getElementById('weather-weight').value / 100,
-                strategy: document.getElementById('strategy-weight').value / 100
-            };
-            
+
+            const qualiInfluence = document.getElementById('quali-weight').value / 100;
             const qualifying = generateQualifying();
-            const track = document.getElementById('track').value;
-            
+            const circuit = document.getElementById('track').value;
+
             try {
                 const response = await fetch('/api/predict', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
                         qualifying: qualifying,
-                        track: track,
-                        weights: weights
+                        circuit: circuit,
+                        quali_influence: qualiInfluence
                     })
                 });
                 
@@ -805,60 +789,21 @@ def index():
 
 @app.route('/api/predict', methods=['POST'])
 def predict():
-    data = request.get_json()
-    qualifying = data.get('qualifying', {})
-    weights = data.get('weights', {})
-    
-    # Sort by qualifying
-    sorted_quali = sorted(qualifying.items(), key=lambda x: x[1])
-    
-    predictions = []
-    total_confidence = 0
-    
-    for i, (code, quali_time) in enumerate(sorted_quali):
-        if code in DRIVERS:
-            # Apply feature weights to prediction
-            base_change = random.gauss(0, 2)
-            
-            # Weight adjustments
-            quali_factor = weights.get('quali', 0.7) * 0.5
-            pace_factor = weights.get('pace', 0.6) * random.uniform(-1, 1)
-            tire_factor = weights.get('tire', 0.45) * random.uniform(-0.5, 0.5)
-            weather_factor = weights.get('weather', 0.3) * random.uniform(-0.3, 0.3)
-            strategy_factor = weights.get('strategy', 0.5) * random.uniform(-0.8, 0.8)
-            
-            total_change = base_change + pace_factor + tire_factor + weather_factor + strategy_factor
-            predicted_pos = max(1, min(10, int(i + 1 + total_change)))
-            
-            # Calculate confidence based on weights
-            confidence = 0.5 + (quali_factor * 0.3) + random.uniform(0, 0.2)
-            confidence = min(0.95, max(0.4, confidence))
-            
-            total_confidence += confidence
-            
-            predictions.append({
-                'position': predicted_pos,
-                'name': DRIVERS[code]['name'],
-                'team': DRIVERS[code]['team'],
-                'number': DRIVERS[code]['number'],
-                'qualifying': i + 1,
-                'change': predicted_pos - (i + 1),
-                'confidence': confidence
-            })
-    
-    # Sort by predicted position
-    predictions.sort(key=lambda x: x['position'])
-    
-    # Re-number positions to avoid duplicates
-    for i, pred in enumerate(predictions):
-        pred['position'] = i + 1
-        pred['change'] = pred['position'] - pred['qualifying']
-    
+    data = request.get_json() or {}
+    qualifying = data.get('qualifying', {})            # {code: simulated_quali_value}
+    circuit = data.get('circuit') or (_FORM["circuits"][0]["circuit_id"])
+    influence = float(data.get('quali_influence', 0.7))
+
+    # qualifying order (P1..Pn) = drivers sorted by their simulated quali value
+    grid_order = [code for code, _ in sorted(qualifying.items(), key=lambda x: x[1])
+                  if code in DRIVERS]
+
+    result = predict_race(grid_order, circuit_id=circuit, quali_influence=influence)
     return jsonify({
-        'predictions': predictions,
-        'accuracy': 68 + int(weights.get('quali', 0.7) * 10),
-        'avgConfidence': int(total_confidence / len(predictions) * 100),
-        'volatility': round(3.5 - weights.get('quali', 0.7) * 2, 1)
+        'predictions': result['predictions'],
+        'accuracy': WINNER_ACC,                                  # real backtest winner acc
+        'avgConfidence': int(round(result['podium_confidence'] * 100)),
+        'volatility': result['reshuffle'],                       # avg positions moved vs grid
     })
 
 if __name__ == '__main__':
