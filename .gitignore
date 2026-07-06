@@ -10,9 +10,12 @@ env/
 # Data files
 *.csv
 data/cache/
+data/_cache/
 data/raw/
 *.pkl
 *.joblib
+# ...but the served model artifact must ship so the app can load it on deploy
+!model/f1_model.pkl
 
 # Notebooks
 .ipynb_checkpoints/
