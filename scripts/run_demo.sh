@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 # F1 Prediction System - One-Command Demo Script
 # Academic research project demonstration

@@ -79,7 +79,7 @@ class F1DemoPredictor:
                 return True
             else:
                 print("⚠️  Model not found at", MODEL_PATH)
-                print("💡 Run the Jupyter notebook first: model/train_model.ipynb")
+                print("💡 Run the Jupyter notebook first: notebooks/train_model.ipynb")
                 print("🔄 Using statistical fallback predictions")
                 self.model = None
                 return False

@@ -199,7 +199,7 @@ def save_race_data(race_data, format='both'):
         json_filename = f"{year}_Round_{round_num:02d}_{event_name}.json"
         json_path = os.path.join(OUTPUT_DIR, json_filename)
         
-        with open(json_path, 'w') as f:
+        with open(json_path, 'w', encoding='utf-8') as f:
             json.dump(race_data, f, indent=2, default=str)
         print(f"💾 JSON saved: {json_filename}")
 

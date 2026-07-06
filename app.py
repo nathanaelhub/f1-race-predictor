@@ -5,6 +5,7 @@ Modern F1 broadcast interface with animations and real-time updates
 """
 
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -42,7 +43,10 @@ HTML_PAGE = """
 <html>
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Interactive F1 race predictor — tune feature weights and watch the finishing order react in real time.">
     <title>F1 AI Race Predictor</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏎️</text></svg>">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -789,7 +793,7 @@ def index():
 
 @app.route('/api/predict', methods=['POST'])
 def predict():
-    data = request.get_json() or {}
+    data = request.get_json(silent=True) or {}
     qualifying = data.get('qualifying', {})            # {code: simulated_quali_value}
     circuit = data.get('circuit') or (_FORM["circuits"][0]["circuit_id"])
     influence = float(data.get('quali_influence', 0.7))
@@ -806,7 +810,11 @@ def predict():
         'volatility': result['reshuffle'],                       # avg positions moved vs grid
     })
 
+@app.route('/health')
+def health():
+    return jsonify({'status': 'ok', 'drivers': len(DRIVERS)})
+
+
 if __name__ == '__main__':
-    import os
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
